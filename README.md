@@ -16,3 +16,7 @@ Third party - not affiliated/associated with Eventbrite in any way
 | EVENTBRITE_API_TOKEN            | Your personal Eventbrite API token - can be retrieved from the Eventbrite   developer portal - https://www.eventbrite.com/platform |
 | AZURE_STORAGE_CONNECTION_STRING | Azure Blob Storage connection string - can be retrieved from the Azure   Portal                                                    |
 | AZURE_STORAGE_CONTAINER_NAME    | Azure Blob Storage container name                                                                                                  |
+
+## Attributions
+
+* ICal.NET - .NET iCal library for .NET - https://github.com/rianjs/ical.net
