@@ -29,11 +29,11 @@ public class EventbriteClient
 
     public async Task<IEnumerable<Event>> GetEventsAsync()
     {
-        var orderIds = await GetUpcomingEventIdsFromOrdersAsync();
+        var orderIds = await GetEventIdsFromOrdersAsync();
         return await GetEventsAsync(orderIds);
     }
 
-    private async Task<IEnumerable<string>> GetUpcomingEventIdsFromOrdersAsync(
+    private async Task<IEnumerable<string>> GetEventIdsFromOrdersAsync(
         List<string>? orderIds = null,
         string? continuation = null)
     {
