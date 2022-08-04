@@ -2,7 +2,7 @@
 
 ## Summary
 
-Azure Function which generates an ICS (ICalendar) compatible event calendar for all of your Eventbrite orders and
+Azure Function which generates an ICS (iCalendar) compatible event calendar for all of your Eventbrite orders and
 uploads it to an Azure Blob Storage container.
 
 Runs by default hourly, on the hour.
