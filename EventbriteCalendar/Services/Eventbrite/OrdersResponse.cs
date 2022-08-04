@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace EventbriteCalendar.Services.Eventbrite;
 
 public class OrdersResponse
 {
     [JsonPropertyName("pagination")]
-    public Pagination Pagination { get; init; }
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public Pagination Pagination { get; init; } = null!;
 
     [JsonPropertyName("orders")]
-    public IReadOnlyList<Order> Orders { get; init; }
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public IReadOnlyList<Order> Orders { get; init; } = null!;
 }

@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace EventbriteCalendar.Services.Eventbrite;
 
 public class Order
 {
     [JsonPropertyName("event_id")]
-    public string EventId { get; init; }
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public string EventId { get; init; } = null!;
 }

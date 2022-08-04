@@ -1,12 +1,15 @@
 ﻿using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace EventbriteCalendar.Services.Eventbrite;
 
 public class TextContainer
 {
     [JsonPropertyName("text")]
-    public string Text { get; init; }
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public string Text { get; init; } = null!;
 
     [JsonPropertyName("html")]
-    public string Html { get; init; }
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public string Html { get; init; } = null!;
 }

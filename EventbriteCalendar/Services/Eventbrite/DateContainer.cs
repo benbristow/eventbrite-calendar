@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace EventbriteCalendar.Services.Eventbrite;
 
 public class DateContainer
 {
-    [JsonPropertyName("timezone")]
-    public string Timezone { get; set; }
-
-    [JsonPropertyName("local")]
-    public DateTime Local { get; set; }
-
     [JsonPropertyName("utc")]
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
     public DateTime Utc { get; set; }
 }
