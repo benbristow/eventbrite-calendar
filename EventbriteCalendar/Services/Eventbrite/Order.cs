@@ -5,7 +5,7 @@ namespace EventbriteCalendar.Services.Eventbrite;
 
 public class Order
 {
-    [JsonPropertyName("event_id")]
+    [JsonPropertyName("event")]
     [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-    public string EventId { get; init; } = null!;
+    public Event Event { get; init; } = null!;
 }

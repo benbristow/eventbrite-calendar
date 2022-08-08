@@ -25,4 +25,8 @@ public class Event
     [JsonPropertyName("end")]
     [UsedImplicitly(ImplicitUseKindFlags.Assign)]
     public DateContainer End { get; init; } = null!;
+
+    [JsonPropertyName("venue")]
+    [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+    public Venue? Venue { get; init; }
 }

@@ -34,27 +34,36 @@ public static class RefreshCalendarFeed
         var azureStorageContainerName = GetEnvironmentVariable("AZURE_STORAGE_CONTAINER_NAME");
 
         var client = new EventbriteClient(eventbriteUserId, eventbriteApiToken);
-        var events = await client.GetEventsAsync();
-        var calendar = BuildCalendarFromEvents(events);
-        await UpdateBlobStorageWithCalendarAsync(azureStorageConnectionString, azureStorageContainerName, eventbriteUserId, calendar);
+        var orders = await client.GetOrdersAsync();
+        var calendar = BuildCalendarFromOrders(orders);
+        await UpdateBlobStorageWithCalendarAsync(azureStorageConnectionString, azureStorageContainerName,
+            eventbriteUserId, calendar);
 
         logger.LogInformation("Finished Eventbrite calendar feed refresh");
     }
 
     private static string GetEnvironmentVariable(string name)
-        => Environment.GetEnvironmentVariable(name) ?? throw new NullReferenceException($"{name} environment variable not set");
+        => Environment.GetEnvironmentVariable(name) ??
+           throw new NullReferenceException($"{name} environment variable not set");
 
-    private static Calendar BuildCalendarFromEvents(IEnumerable<Event> events)
+    private static Calendar BuildCalendarFromOrders(IEnumerable<Order> orders)
     {
         var calendar = new Calendar();
-        calendar.Events.AddRange(events
+        calendar.Events.AddRange(orders
+            .Select(o => o.Event)
             .Select(e => new CalendarEvent
             {
                 Summary = e.Name.Text,
                 Description = e.Description.Html,
                 Start = new CalDateTime(e.Start.Utc, "UTC"),
                 End = new CalDateTime(e.End.Utc, "UTC"),
-                Url = e.Url
+                Url = e.Url,
+                GeographicLocation = e.Venue != null
+                    ? new GeographicLocation(double.Parse(e.Venue.Address.Latitude), double.Parse(e.Venue.Address.Longitude))
+                    : null,
+                Location = e.Venue != null
+                    ? $"{e.Venue.Name}, {e.Venue?.Address.LocalizedAddressDisplay}"
+                    : null
             }));
         return calendar;
     }

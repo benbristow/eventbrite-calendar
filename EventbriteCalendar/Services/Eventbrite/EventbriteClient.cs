@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -27,23 +24,27 @@ public class EventbriteClient
         _token = token;
     }
 
-    public async Task<IEnumerable<Event>> GetEventsAsync()
-    {
-        var orderIds = await GetEventIdsFromOrdersAsync();
-        return await GetEventsAsync(orderIds);
-    }
-
-    private async Task<IEnumerable<string>> GetEventIdsFromOrdersAsync(
-        List<string>? orderIds = null,
+    public async Task<IEnumerable<Order>> GetOrdersAsync(
+        List<Order>? orders = null,
         string? continuation = null)
     {
         while (true)
         {
-            orderIds ??= new List<string>();
+            orders ??= new List<Order>();
 
-            var page = await GetAuthenticatedAsync<OrdersResponse>($"users/{_userId}/orders",
-                continuation != null ? new Dictionary<string, string> { { "continuation", continuation } } : null);
-            orderIds.AddRange(page.Orders.Select(o => o.EventId));
+            var parms = new Dictionary<string, string>
+            {
+                { "expand", "event.venue" }
+            };
+            if (continuation != null)
+            {
+                parms.Add("continuation", continuation);
+            }
+
+            var page = await GetAuthenticatedAsync<OrdersResponse>($"users/{_userId}/orders", parms);
+
+            orders.AddRange(page.Orders);
+
             if (page.Pagination.HasMoreItems)
             {
                 continuation = page.Pagination.Continuation;
@@ -53,28 +54,13 @@ public class EventbriteClient
             break;
         }
 
-        return orderIds;
+        return orders;
     }
 
-    private async Task<IEnumerable<Event>> GetEventsAsync(IEnumerable<string> eventIds)
-    {
-        var events = new ConcurrentBag<Event>();
-
-        await Parallel.ForEachAsync(
-            eventIds,
-            new ParallelOptions { MaxDegreeOfParallelism = 5 },
-            async (eventId, cancellationToken) =>
-            {
-                events.Add(await GetAuthenticatedAsync<Event>($"events/{eventId}", cancellationToken: cancellationToken));
-            });
-
-        return events.OrderByDescending(e => e.Start.Utc).ToImmutableList();
-    }
-
-    private async Task<T> GetAuthenticatedAsync<T>(string path, IReadOnlyDictionary<string, string>? queryParams = null, CancellationToken? cancellationToken = null)
+    private async Task<T> GetAuthenticatedAsync<T>(string path, IReadOnlyDictionary<string, string>? parms = null, CancellationToken? cancellationToken = null)
     {
         cancellationToken ??= CancellationToken.None;
-        var requestQueryParams = new Dictionary<string, string>(queryParams ?? new Dictionary<string, string>())
+        var requestQueryParams = new Dictionary<string, string>(parms ?? new Dictionary<string, string>())
             { { "token", _token } };
         var responseString = await _httpClient.GetStringAsync($"{path}{QueryString.Create(requestQueryParams)}", cancellationToken.Value);
         return JsonSerializer.Deserialize<T>(responseString)!;
